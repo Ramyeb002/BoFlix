@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BoFlix - Tu sitio para ver Películas</title>
-    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,15 +32,25 @@
     <p>BoFlix es tu sitio para ver las mejores películas desde la comodidad de tu hogar. Disfruta del contenido que más te gusta cuando quieras.</p>
     
     <div class="video-container">
-        <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="360">
-            <source src="https://104.131.63.45/output.m3u8" type="application/x-mpegURL" />
-        </video>
+        <video id="my-video" controls width="640" height="360"></video>
     </div>
     
-    <script src="https://vjs.zencdn.net/7.11.4/video.min.js" />
     <script>
-        // Inicializar el reproductor de Video.js
-        var player = videojs('my-video');
+        if (Hls.isSupported()) {
+            var video = document.getElementById('my-video');
+            var hls = new Hls();
+            hls.loadSource('https://104.131.63.45/output.m3u8');
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play();
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Para Safari u otros navegadores compatibles
+            video.src = 'https://104.131.63.45/output.m3u8';
+            video.addEventListener('loadedmetadata', function() {
+                video.play();
+            });
+        }
     </script>
 </body>
 </html>
